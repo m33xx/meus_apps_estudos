@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educa One - Portal UDESC</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- TELA DE AUTENTICAÇÃO (LOGIN / CADASTRO) -->
+    <div id="tela-auth" class="tela">
+        <div class="card-auth">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo Educa One" class="app-logo">
+            </div>
+            <h2>Educa One</h2>
+            <p id="auth-subtitulo">Acesse a sua conta acadêmica</p>
+            
+            <div id="campos-cadastro" class="escondido">
+                <input type="text" id="cad-nome" placeholder="Nome Completo">
+                <input type="text" id="cad-curso" placeholder="Curso (Ex: Engenharia / Sistemas)">
+            </div>
+            
+            <input type="email" id="auth-email" placeholder="E-mail">
+            <input type="password" id="auth-senha" placeholder="Senha">
+            
+            <button id="btn-acao-auth" onclick="realizarLogin()">Entrar</button>
+            <p class="trocar-auth" onclick="alternarModoAuth()">Não tem uma conta? <span id="link-troca">Cadastre-se</span></p>
+            
+            <div class="footer-creditos">
+                <p>Este aplicativo foi desenvolvido por alunos da UDESC</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA PRINCIPAL (DASHBOARD) -->
+    <div id="tela-home" class="tela escondido">
+        <header>
+            <div>
+                <h2 id="saudacao-nome">Olá, Estudante</h2>
+                <p id="saudacao-curso" class="sub-header">Curso</p>
+            </div>
+            <button onclick="fazerLogout()" class="btn-sair">Sair</button>
+        </header>
+        
+        <main>
+            <!-- Barra de Progresso do Semestre -->
+            <div class="secao-progresso">
+                <h3>⏳ Andamento do Semestre</h3>
+                <p id="texto-progresso-semestre">Calculando período...</p>
+                <div class="barra-progresso-fundo">
+                    <div id="barra-progresso-topo" class="barra-progresso-topo"></div>
+                </div>
+            </div>
+
+            <!-- PAINEL DE PRÓXIMOS COMPROMISSOS E AULAS -->
+            <div class="secao-compromissos">
+                <h3>📅 Próximas Aulas e Compromissos</h3>
+                <div id="lista-compromissos-geral">
+                    <p class="texto-vazio">Nenhum compromisso cadastrado nas disciplinas ainda.</p>
+                </div>
+            </div>
+
+            <div class="topo-materias">
+                <h3>📚 Minhas Disciplinas</h3>
+                <button onclick="abrirModalMateria()" class="btn-adicionar-mini">+ Nova Matéria</button>
+            </div>
+            
+            <div id="lista-materias">
+                <!-- Inserido dinamicamente -->
+            </div>
+        </main>
+    </div>
+
+    <!-- TELA DE DETALHES DA MATÉRIA (MODULAR) -->
+    <div id="tela-detalhes" class="tela escondido">
+        <header class="header-detalhes">
+            <button onclick="voltarHome()" class="btn-voltar">← Voltar</button>
+            <h2 id="titulo-materia-ativa">Matéria</h2>
+        </header>
+        
+        <!-- ABAS DE NAVEGAÇÃO INTERNA -->
+        <div class="abas-container">
+            <button class="aba-btn ativa" onclick="mudarAba('notas')">Notas</button>
+            <button class="aba-btn" onclick="mudarAba('agenda')">Agenda</button>
+            <button class="aba-btn" onclick="mudarAba('links')">Links</button>
+            <button class="aba-btn" onclick="mudarAba('resumos')">Resumos</button>
+        </div>
+
+        <main class="conteudo-abas">
+            <!-- ABA 1: NOTAS E CALCULADORA PERSONALIZADA -->
+            <div id="aba-notas" class="conteudo-aba">
+                <div class="card-bloco">
+                    <h4>⚙️ Configurar Critérios e Pesos (%)</h4>
+                    <p class="dica-texto">Defina o nome e o peso de cada avaliação (a soma dos pesos deve fechar 100%). Média para aprovação: 6.0</p>
+                    
+                    <div class="linha-avaliacao">
+                        <input type="text" id="nome-av1" value="Prova 1" oninput="salvarDadosMateria()">
+                        <input type="number" id="peso-av1" value="40" placeholder="Peso %" oninput="calcularMediaMateria()">
+                        <input type="number" id="nota-av1" placeholder="Nota (0-10)" oninput="calcularMediaMateria()">
+                    </div>
+                    <div class="linha-avaliacao">
+                        <input type="text" id="nome-av2" value="Trabalho" oninput="salvarDadosMateria()">
+                        <input type="number" id="peso-av2" value="60" placeholder="Peso %" oninput="calcularMediaMateria()">
+                        <input type="number" id="nota-av2" placeholder="Nota (0-10)" oninput="calcularMediaMateria()">
+                    </div>
+
+                    <div id="resultado-calculo-box" class="resultado-box">
+                        <p id="txt-media-parcial">Média Atual: --</p>
+                        <p id="txt-quanto-falta">Falta para atingir a média (6.0): --</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 2: AGENDA E PROFESSOR -->
+            <div id="aba-agenda" class="conteudo-aba escondido">
+                <div class="card-bloco">
+                    <h4>👨‍🏫 Informações do Professor</h4>
+                    <input type="text" id="prof-nome" placeholder="Nome do Professor" oninput="salvarInfoProfessor()">
+                    <input type="text" id="prof-contato" placeholder="E-mail ou Sala do Professor" oninput="salvarInfoProfessor()">
+                </div>
+                <div class="card-bloco">
+                    <h4>📅 Adicionar Novo Compromisso / Aula</h4>
+                    <input type="text" id="input-agenda-titulo" placeholder="Tópico / Título (Ex: Aula Prática)">
+                    <div class="linha-avaliacao">
+                        <input type="text" id="input-agenda-dia" placeholder="Dia (Ex: Terça-feira)">
+                        <input type="text" id="input-agenda-horario" placeholder="Horário (Ex: 19:00)">
+                    </div>
+                    <button onclick="adicionarCompromissoMateria()">Salvar Compromisso</button>
+                    <div id="lista-agenda-materia" class="lista-customizada"></div>
+                </div>
+            </div>
+
+            <!-- ABA 3: LINKS E VÍDEOS -->
+            <div id="aba-links" class="conteudo-aba escondido">
+                <div class="card-bloco">
+                    <h4>🔗 Links Úteis e Vídeos do YouTube</h4>
+                    <input type="text" id="input-link-titulo" placeholder="Título (Ex: Aula YouTube)">
+                    <input type="url" id="input-link-url" placeholder="URL (https://...)">
+                    <button onclick="adicionarLinkMateria()">Adicionar Link</button>
+                    <div id="lista-links-materia" class="lista-customizada"></div>
+                </div>
+            </div>
+
+            <!-- ABA 4: RESUMOS POR TÓPICOS COM TAGS -->
+            <div id="aba-resumos" class="conteudo-aba escondido">
+                <div class="card-bloco">
+                    <h4>📝 Novo Resumo por Tópico</h4>
+                    <input type="text" id="input-resumo-tag" placeholder="Etiqueta / Tag (Ex: Tópico 1, Aula 03)">
+                    <textarea id="input-resumo-texto" placeholder="Escreva o resumo ou anotações deste tópico..."></textarea>
+                    <button onclick="adicionarResumoMateria()">Salvar Resumo</button>
+                </div>
+                <div class="card-bloco">
+                    <h4>📚 Meus Resumos Salvos</h4>
+                    <div id="lista-resumos-materia" class="lista-resumos-container"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL CRIAR MATÉRIA -->
+    <div id="modal-materia" class="modal escondido">
+        <div class="modal-conteudo">
+            <h3>Criar Nova Disciplina</h3>
+            <input type="text" id="input-nova-materia" placeholder="Nome da Matéria">
+            <div class="modal-botoes">
+                <button onclick="fecharModalMateria()" class="btn-cinza">Cancelar</button>
+                <button onclick="criarMateria()">Criar Matéria</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
